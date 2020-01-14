@@ -32,13 +32,10 @@
 
 	<script>
 		var textArea = document.querySelector('#text'),
-			charCount = document.querySelector('#character-count'),
-			textAreaContent, textLength;
+			charCount = document.querySelector('#character-count');
 
-		textArea.addEventListener('keyup', function() {
-			textAreaContent = textArea.value;
-			textLength = textAreaContent.length;
-			charCount.textContent = textLength;
+		textArea.addEventListener('input', function() {
+			charCount.textContent = textArea.value.length;
 		}, false);
 	</script>
 </body>
