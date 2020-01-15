@@ -31,7 +31,20 @@
 	<p>You've written <strong><span id="word-count">0</span> words</strong> and <strong><span id="character-count">0</span> characters</strong>.</p>
 
 	<script>
-		// Your code goes here...
+		var textArea = document.querySelector('#text'),
+			charCount = document.querySelector('#character-count'),
+			wordCount = document.querySelector('#word-count'),
+			wordArray;
+
+		textArea.addEventListener('input', function() {
+			wordArray = (textArea.value.split(' ')).filter(function(item) {
+				return item.length > 0;
+			});
+			wordCount.textContent = wordArray.length;
+			charCount.textContent = textArea.value.length;
+
+		}, false);
+
 	</script>
 </body>
 </html>
