@@ -33,10 +33,9 @@
 
 	<script>
 
-		// Get the text area, and word and character count elements
+		// Get the text area, and count element
 		var text = document.querySelector('#text');
-		var wordCount = document.querySelector('#word-count');
-		var charCount = document.querySelector('#character-count');
+		var count = document.querySelector('#count');
 
 		// Listen for changes to the text area content
 		text.addEventListener('input', function () {
@@ -46,11 +45,9 @@
 				return word.length > 0;
 			});
 
-			// Display the word count
-			wordCount.textContent = words.length;
+			// Replace the HTML contents of the count element with updated word and character counts
+			count.innerHTML = "You\'ve written \<strong\>" + words.length + " words\<\/strong\> and \<strong\>" + text.value.length + " characters\<\/strong\>."
 
-			// Display the characters count
-			charCount.textContent = text.value.length;
 
 		}, false);
 
