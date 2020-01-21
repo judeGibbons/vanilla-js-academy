@@ -35,6 +35,7 @@
 		// Get the blockquote and button elements
 		var quote = document.querySelector('#quote');
 		var btn = document.querySelector('#get-quote');
+		var quoteArray = [];
 
 		// Get a fresh quote and render it into the DOM
 		var getQuote = function () {
@@ -46,7 +47,21 @@
 					return Promise.reject(response);
 				}
 			}).then(function (data) {
-				quote.textContent = data[0];
+
+				var thisQuote = data[0];
+
+				if (quoteArray.indexOf(thisQuote) > -1) {
+					getQuote();
+
+				} else {
+					quote.textContent = thisQuote;
+
+					if (quoteArray.length == 50) {
+						quoteArray.pop();
+					}
+					quoteArray.push(thisQuote);
+				}
+
 			}).catch(function (error) {
 				quote.textContent = '[Something went wrong, sorry!] I have a joke for you... The government in this town is excellent, and uses your tax dollars efficiently.';
 			});
