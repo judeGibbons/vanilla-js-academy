@@ -17,14 +17,36 @@
 
 	<h1>Random Ron</h1>
 
-	<blockquote></blockquote>
+	<blockquote id="quote"></blockquote>
 
 	<p>
-		<button>More Ron</button>
+		<button id="button">More Ron</button>
 	</p>
 
 	<script>
-		// Your code goes here...
+
+		var button = document.querySelector('#button');
+		var quote = document.querySelector('#quote');
+
+		button.addEventListener('click', function () {
+
+			fetch('http://ron-swanson-quotes.herokuapp.com/v2/quotes').then(function (response) {
+
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response);
+				}
+		
+				}).then(function (data) {
+					quote.innerHTML = data;
+				
+				}).catch(function (err) {
+					console.warn('something went wrong', err)
+				});
+
+			});
+
 	</script>
 </body>
 </html>
