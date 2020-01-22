@@ -16,10 +16,32 @@
 
 	<h1>What to read today</h1>
 
-	<div id="app"></div>
+	<div id="app" aria-live="polite">
+		<em>Waiting for stories to load...</em>
+	</div>
 
 	<script>
-		// Your code goes here...
+		
+		var stories = document.querySelector('#app');
+
+		fetch('https://api.nytimes.com/svc/topstories/v2/home.json?api-key=API_KEY').then(function (response) {
+			if (response.ok) {
+				return response.json();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+
+			stories.innerHTML = '<ul>' +
+				data.results.map(function(story) {
+					return '<li><a href="' + story.url + '">' + story.title + '</a></li>';
+				}).join('')
+				+ '</ul>';
+
+		}).catch(function (error) {
+			stories.textContent = 'Something went wrong, sorry!';
+		});
+
 	</script>
 </body>
 </html>
