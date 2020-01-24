@@ -10,6 +10,49 @@
 			max-width: 40em;
 			width: 88%;
 		}
+
+		ul {
+			font-family: "Open Sans", sans-serif;
+		}
+
+		li {
+			list-style: none;
+		}
+
+		li:after {
+			display: table;
+			content: "";
+			clear: both;
+		}
+
+		li span {
+			display: block;
+		}
+
+		span.title {
+			font-size: 0.9rem;
+			font-weight: 600;
+			width: 90%;
+			float: left;
+		}
+
+		span.byline {
+			font-size: 0.8rem;
+			float: right;
+			font-style: italic;
+		}
+
+		span.description {
+			font-size: 0.7rem;
+			padding: 3px 0 10px 20px;
+		}
+
+		span.date {
+			font-size: 0.7rem;
+			float: right;
+			width: 9%;
+		}
+
 	</style>
 </head>
 <body>
@@ -23,8 +66,9 @@
 	<script>
 		
 		var stories = document.querySelector('#app');
+		var apiKey = '';
 
-		fetch('https://api.nytimes.com/svc/topstories/v2/home.json?api-key=API_KEY').then(function (response) {
+		fetch('https://api.nytimes.com/svc/topstories/v2/home.json?api-key=' + apiKey).then(function (response) {
 			if (response.ok) {
 				return response.json();
 			} else {
@@ -34,7 +78,12 @@
 
 			stories.innerHTML = '<ul>' +
 				data.results.map(function(story) {
-					return '<li><a href="' + story.url + '">' + story.title + '</a></li>';
+					return  '<li>' +
+							'<span class="title"><a href="' + story.url + '">' + story.title + '</a></span>' +
+							'<span class="date">' + story.published_date + '</span>' +
+							'<span class="description">' + story.abstract + '</span>' +
+							'<span class="byline">' + story.byline + '</span>' +
+							'</li>';
 				}).join('')
 				+ '</ul>';
 
