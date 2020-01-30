@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>What to read today</title>
+
+	<style type="text/css">
+		body {
+			margin: 1em auto;
+			max-width: 40em;
+			width: 88%;
+		}
+
+		ul {
+			font-family: "Open Sans", sans-serif;
+		}
+
+		li {
+			list-style: none;
+		}
+
+		li:after {
+			display: table;
+			content: "";
+			clear: both;
+		}
+
+		li span {
+			display: block;
+		}
+
+		span.title {
+			font-size: 0.9rem;
+			font-weight: 600;
+			width: 90%;
+			float: left;
+		}
+
+		span.byline {
+			font-size: 0.8rem;
+			float: right;
+			font-style: italic;
+		}
+
+		span.description {
+			font-size: 0.7rem;
+			padding: 3px 0 10px 20px;
+		}
+
+		span.date {
+			font-size: 0.7rem;
+			float: right;
+			width: 9%;
+		}
+
+	</style>
+</head>
+<body>
+
+	<h1>What to read today</h1>
+
+	<div id="app" aria-live="polite">
+		<em>Waiting for stories to load...</em>
+	</div>
+
+	<script>
+		
+		var stories = document.querySelector('#app');
+		var apiKey = '';
+
+		fetch('https://api.nytimes.com/svc/topstories/v2/home.json?api-key=' + apiKey).then(function (response) {
+			if (response.ok) {
+				return response.json();
+			} else {
+				return Promise.reject(response);
+			}
+		}).then(function (data) {
+
+			stories.innerHTML = '<ul>' +
+				data.results.map(function(story) {
+					return  '<li>' +
+							'<span class="title"><a href="' + story.url + '">' + story.title + '</a></span>' +
+							'<span class="date">' + story.published_date + '</span>' +
+							'<span class="description">' + story.abstract + '</span>' +
+							'<span class="byline">' + story.byline + '</span>' +
+							'</li>';
+				}).join('')
+				+ '</ul>';
+
+		}).catch(function (error) {
+			stories.textContent = 'Something went wrong, sorry!';
+		});
+
+	</script>
+</body>
+</html>
