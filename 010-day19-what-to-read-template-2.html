@@ -66,30 +66,37 @@
 	<script>
 		
 		var stories = document.querySelector('#app');
+		var categories = ['sundayreview', 'books', 'food', 'obituaries'];
 		var apiKey = '';
 
-		fetch('https://api.nytimes.com/svc/topstories/v2/home.json?api-key=' + apiKey).then(function (response) {
-			if (response.ok) {
-				return response.json();
-			} else {
-				return Promise.reject(response);
-			}
-		}).then(function (data) {
 
-			stories.innerHTML = '<ul>' +
-				data.results.map(function(story) {
-					return  '<li>' +
-							'<span class="title"><a href="' + story.url + '">' + story.title + '</a></span>' +
-							'<span class="date">' + story.published_date + '</span>' +
-							'<span class="description">' + story.abstract + '</span>' +
-							'<span class="byline">' + story.byline + '</span>' +
-							'</li>';
-				}).join('')
-				+ '</ul>';
+		categories.map(function(cat) {
+			return fetch('https://api.nytimes.com/svc/topstories/v2/' + cat + '.json?api-key=' + apiKey).then(function (response) {
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response);
+				}
 
-		}).catch(function (error) {
-			stories.textContent = 'Something went wrong, sorry!';
+			}).then(function (data) {
+				var thisStory = '<h2>' + cat + '</h2><ul>' +
+					data.results.map(function(story, index) {
+						if (index < 5) {
+							return '<li>' +
+								'<span class="title"><a href="' + story.url + '">' + story.title + '</a></span>' +
+								'<span class="date">' + story.published_date + '</span>' +
+								'<span class="description">' + story.abstract + '</span>' +
+								'<span class="byline">' + story.byline + '</span>' +
+								'</li>';
+						}
+					}).join('')
+					+ '</ul>';
+					stories.innerHTML += thisStory;
+			}).catch(function (error) {
+				stories.textContent = 'Something went wrong, sorry!';
+			});
 		});
+
 
 	</script>
 </body>
