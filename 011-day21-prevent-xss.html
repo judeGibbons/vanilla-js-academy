@@ -75,7 +75,11 @@
 		var newStories = '';
 
 
-
+		var sanitizeHTML = function (str) {
+			var temp = document.createElement('div');
+			temp.textContent = str;
+			return temp.innerHTML;
+		};
 
 		var getArticles = function(cat) {
 			fetch('https://api.nytimes.com/svc/topstories/v2/' + cat + '.json?api-key=' + apiKey).then(function (response) {
@@ -90,10 +94,10 @@
 					data.results.map(function(story, index) {
 						if (index < numberOfArticles) {
 							return '<li>' +
-								'<span class="title"><a href="' + story.url + '">' + story.title + '</a></span>' +
-								'<span class="date">' + story.published_date + '</span>' +
-								'<span class="description">' + story.abstract + '</span>' +
-								'<span class="byline">' + story.byline + '</span>' +
+								'<span class="title"><a href="' + sanitizeHTML(story.url) + '">' + sanitizeHTML(story.title) + '</a></span>' +
+								'<span class="date">' + sanitizeHTML(story.published_date) + '</span>' +
+								'<span class="description">' + sanitizeHTML(story.abstract) + '</span>' +
+								'<span class="byline">' + sanitizeHTML(story.byline + '</span>' +
 								'</li>';
 						}
 					}).join('')
