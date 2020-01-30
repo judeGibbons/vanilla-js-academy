@@ -71,10 +71,14 @@
 		var stories = document.querySelector('#app');
 		var categories = ['sundayreview', 'books', 'food', 'obituaries'];
 		var apiKey = '';
+		var numberOfArticles = 5;
+		var newStories = '';
 
 
-		categories.map(function(cat) {
-			return fetch('https://api.nytimes.com/svc/topstories/v2/' + cat + '.json?api-key=' + apiKey).then(function (response) {
+
+
+		var getArticles = function(cat) {
+			fetch('https://api.nytimes.com/svc/topstories/v2/' + cat + '.json?api-key=' + apiKey).then(function (response) {
 				if (response.ok) {
 					return response.json();
 				} else {
@@ -84,7 +88,7 @@
 			}).then(function (data) {
 				var thisStory = '<h2>' + cat + '</h2><ul>' +
 					data.results.map(function(story, index) {
-						if (index < 5) {
+						if (index < numberOfArticles) {
 							return '<li>' +
 								'<span class="title"><a href="' + story.url + '">' + story.title + '</a></span>' +
 								'<span class="date">' + story.published_date + '</span>' +
@@ -94,12 +98,16 @@
 						}
 					}).join('')
 					+ '</ul>';
-					stories.innerHTML += thisStory;
+					newStories += thisStory;
+					stories.innerHTML = newStories;
 			}).catch(function (error) {
 				stories.textContent = 'Something went wrong, sorry!';
 			});
-		});
+		};
 
+		categories.map(function(cat) {
+			return getArticles(cat);
+		});
 
 	</script>
 </body>
