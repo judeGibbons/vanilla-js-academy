@@ -10,9 +10,6 @@
 			margin: 1em auto;
 			max-width: 40em;
 			width: 88%;
-		}
-
-		#app {
 			position: relative;
 		}
 
@@ -30,8 +27,8 @@
 			padding: 1em;
 		}
 
-		.gameover {
-			display: block;
+		#livearea {
+			display: none;
 			height: 100%;
 			width: 100%;
 			position: absolute;
@@ -39,27 +36,25 @@
 			font-family: 'Arial', 'sans-serif';
 			font-weight: bold;
 			text-align: center;
+			z-index: 10;
+			background-color: rgba(255, 255, 255, 0.5);
+
 		}
 
 		.gameovertext {
 			width: 100%;
 			font-size: 72px;
 			color: rgb(255, 90, 0);
-			height: 50%;
-			position: relative;
-			top: 40%;
-			z-index: -10;
+			margin-top: 33%;
 		}
 
-		.gameoverlink {
+		#gameoverlink {
 			display: block;
 			margin: 20px auto 0;
 			font-size: 36px;
 			width: max-content;
 			padding: 10px;
 			color: rgb(90, 0, 255);;
-			z-index: 10;
-			background-color: rgba(255, 255, 255, 0.5);
 		}
 
 		/**
@@ -76,6 +71,7 @@
 	<h1>Monsters! - Reveal</h1>
 
 	<div id="app"></div>
+	<div id="livearea" aria-live="true"></div>
 
 	<footer>
 		<hr>
@@ -100,6 +96,7 @@
 		];
 
 		var monsterDiv = document.querySelector('#app');
+		var liveArea = document.querySelector('#livearea');
 		var url = "monsters/";
 
 		/**
@@ -130,46 +127,59 @@
 		};
 
 
-
 		var shuffledMonsters = shuffle(monsters.slice());
 		var gameOverText = '';
 		var count = 0;
 
 		var monsterPics = shuffledMonsters.map(function(monster, index) {
-			return '<div class="grid" data-index="' + index + '"><img src="' + url + 'door.svg" alt="a picture of a door"></div>';
+			return '<div class="grid" data-index="' + index + '"><img src="' + url + 'door.svg" alt="a picture of a door" role="button" tabindex="0"></div>';
 		}).join('');
 
 		monsterDiv.innerHTML = '<div class="row">' + monsterPics + '</div>';
 
+		var gridItems = Array.prototype.slice.call(document.querySelectorAll(".grid"));
 
 
-		var gridItems = Array.prototype.slice.call(document.querySelectorAll(".grid")); 
+		var showMonsters = function(event) {
+
+			if ((event.type == 'click') || ((event.type == 'keyup') && (event.key == 'Enter') )) {
+
+				var focusLink = function() {
+					var link = document.getElementById('gameoverlink');
+					link.focus();
+				};
 
 
-		document.addEventListener('click', function (event) {
+				var gridParent = event.target.closest(".grid");
 
-			var gridParent = event.target.closest(".grid");
+				if ((event.target.matches("img") && (gridItems.indexOf(gridParent) > -1))) {
 
-			if ((event.target.matches("img") && (gridItems.indexOf(gridParent) > -1))) {
+					count++;
 
-				count++;
+					var thisIndex = gridParent.getAttribute('data-index');
 
-				var thisIndex = gridParent.getAttribute('data-index');
+					gridParent.innerHTML = '<img src="' + url +  shuffledMonsters[thisIndex] + '.svg" alt="a picture of monster number ' + thisIndex + '">';
 
-				gridParent.innerHTML = '<img src="' + url +  shuffledMonsters[thisIndex] + '.svg" alt="a picture of monster number ' + thisIndex + '">';
+					if (shuffledMonsters[thisIndex] == 'sock') {
+						gameOverText = 'You lose!';
+					} else if (count == (shuffledMonsters.length-1)) {
+						gameOverText = 'You win!';
+					}
 
-				if (shuffledMonsters[thisIndex] == 'sock') {
-					gameOverText = 'You lose!';
-				} else if (count == (shuffledMonsters.length-1)) {
-					gameOverText = 'You win!';
+					if (gameOverText.length > 0) {
+						liveArea.style.display = 'block';
+
+
+						liveArea.innerHTML += '<div class="gameover"><div class="gameovertext">' + gameOverText + '</div><a id="gameoverlink" href="013-day25-monsters-reveal-template.html">Play again</a></div>';
+						focusLink();
+					}
 				}
+			};
+		};
 
-				if (gameOverText.length > 0) {
-					monsterDiv.innerHTML += '<div class="gameover"><div class="gameovertext">' + gameOverText + '</div><a class="gameoverlink" href="013-day25-monsters-reveal-template.html">Play again</a></div>';
-				}
-			}
 
-		}, false);
+		document.addEventListener('click', showMonsters, false);
+		document.addEventListener('keyup', showMonsters, false);
 
 
 	</script>
