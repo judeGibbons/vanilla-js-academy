@@ -113,8 +113,14 @@
       tableOfContents.innerHTML =
         '<h2>Table of Contents</h2>' +
         '<ol>' +
-          Array.prototype.slice.call(headings).map(function (heading) {
-            return '<li><a href="#' + heading.id + '">' + heading.textContent + '</a></li>';
+          Array.prototype.slice.call(headings).map(function (heading, index) {
+            if (heading.id.length > 0) {
+              var id = heading.id;
+            } else {
+              var id = 'id' + index;
+              heading.id = id;
+            }
+            return '<li><a href="#' + id + '">' + heading.textContent + '</a></li>';
           }).join('') +
         '</ol>';
     }
