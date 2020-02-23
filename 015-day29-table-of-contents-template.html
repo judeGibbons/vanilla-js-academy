@@ -96,7 +96,22 @@
   </footer>
 
   <script>
-    // Your code goes here...
+    var contents = document.querySelector('#table-of-contents');
+    var headings = Array.prototype.slice.call(document.querySelectorAll('h2'));
+
+    contents.innerHTML =
+      '<ul>' +
+        headings.map(function (heading, index) {
+          var html =
+            '<li><a href="#' +
+              heading.id +
+            '">' +
+            heading.textContent +
+            '</a></li>';
+          return html;
+        }).join('') +
+      '</ul>';
+
   </script>
 </body>
 </html>
