@@ -117,7 +117,8 @@
             if (heading.id.length > 0) {
               var id = heading.id;
             } else {
-              var id = 'id' + index;
+              var id = heading.textContent.replace(new RegExp(/[^a-z0-9]+/,'gi'), '-');
+
               heading.id = id;
             }
             return '<li><a href="#' + id + '">' + heading.textContent + '</a></li>';
