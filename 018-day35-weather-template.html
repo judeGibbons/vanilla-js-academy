@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
 	<title>Weather App</title>
+
 
 	<style type="text/css">
 		body {
@@ -9,6 +11,7 @@
 			max-width: 30em;
 			width: 88%;
 		}
+
 	</style>
 </head>
 <body>
@@ -18,7 +21,49 @@
 	<div id="app">Checking the weather near you...</div>
 
 	<script>
-		// Your code goes here...
+
+		var appDiv = document.querySelector('#app');
+		var apiKey = '';
+
+
+		var getWeather = function() {
+			fetch('https://ipapi.co/json').then(function (response) {
+				if (response.ok) {
+					return response.json();
+				} else {
+					return Promise.reject(response);
+				}
+
+			}).then(function (data) {
+
+				var lat = data.latitude;
+				var lon = data.longitude;
+
+
+				return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + lat + '&lon=' + lon);
+
+			}).then(function (weather) {
+
+				console.log(weather);
+
+				if (weather.ok) {
+					return weather.json();
+				} else {
+					return Promise.reject(weather);
+				}
+
+			}).then(function(weather) {
+				console.log(weather);
+
+
+			}).catch(function (error) {
+				console.warn('error');
+			})
+
+
+		}();
+
+
 	</script>
 </body>
 </html>
