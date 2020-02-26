@@ -87,11 +87,22 @@
 
 			}).then(function(weather) {
 
-				var obsTime = new Date(weather.data[0].last_ob_time);
+				renderWeather(weather.data[0]);
+
+			}).catch(function (error) {
+				appDiv.innerHTML = "<p>There was a problem getting the weather.<br /><em>(error: " + error.statusText + ")</em></p>";
+			})
+
+		}();
+
+
+		var renderWeather = function(weather) {
+
+				var obsTime = new Date(weather.last_ob_time);
 				var dateString = obsTime.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 				var timeString = obsTime.toLocaleString('en-GB', { hour: 'numeric', minute: 'numeric' });
-				var sunrise = weather.data[0].sunrise;
-				var sunset = weather.data[0].sunset;
+				var sunrise = weather.sunrise;
+				var sunset = weather.sunset;
 				var timeOfDay;
 				var precipitation;
 
@@ -110,36 +121,37 @@
 					timeOfDay = 'n';
 				};
 
-				if (weather.data[0].snow > 0) {
+				if (weather.snow > 0) {
 					precipitation = 'It is snowing.';
-				} else if (weather.data[0].precip > 0) {
+				} else if (weather.precip > 0) {
 					precipitation = 'It is raining.';
 				} else {
 					precipitation = 'It is dry.';
 				}
 
+				var sanitizeHTML = function (str) {
+					var temp = document.createElement('div');
+					temp.textContent = str;
+					return temp.innerHTML;
+				};
+
 				appDiv.innerHTML = 
 					"<p>The weather in " +
-					weather.data[0].city_name +
+					sanitizeHTML(weather.city_name) +
 					", recorded at " +
 					timeString +
 					" on " +
 					dateString +
-					": <strong>" + weather.data[0].weather.description.toLowerCase() +
+					": <strong>" + sanitizeHTML(weather.weather.description.toLowerCase()) +
 					"</strong>. " + precipitation + "</p>" +
-					"<div class='icon " + timeOfDay + "'><img alt='Weather API day '" + weather.data[0].weather.description + " src='https://www.weatherbit.io/static/img/icons/" + weather.data[0].weather.icon + ".png'></div>" +
+					"<div class='icon " + timeOfDay + "'><img alt='Weather API day '" + sanitizeHTML(weather.weather.description) + " src='https://www.weatherbit.io/static/img/icons/" + sanitizeHTML(weather.weather.icon) + ".png'></div>" +
 					"<dl>" +
-					"<dt>Temperature:</dt><dd>" + weather.data[0].temp + "&deg;C</dd>" +
-					"<dt>Cloud cover:</dt><dd>" + weather.data[0].clouds + "%</dd>" +
-					"<dt>Wind:</dt><dd>" + weather.data[0].wind_spd.toFixed(1) + "kmh<sup>-1</sup> " + weather.data[0].wind_cdir + "</dd>" +
+					"<dt>Temperature:</dt><dd>" + sanitizeHTML(weather.temp) + "&deg;C</dd>" +
+					"<dt>Cloud cover:</dt><dd>" + sanitizeHTML(weather.clouds) + "%</dd>" +
+					"<dt>Wind:</dt><dd>" + sanitizeHTML(weather.wind_spd.toFixed(1)) + "kmh<sup>-1</sup> " + sanitizeHTML(weather.wind_cdir) + "</dd>" +
 					"</dl>";
 
-			}).catch(function (error) {
-				appDiv.innerHTML = "<p>There was a problem getting the weather.<br /><em>(error: " + error.statusText + ")</em></p>";
-			})
-
-		}();
-
+		}
 
 	</script>
 </body>
