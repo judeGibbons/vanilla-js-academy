@@ -12,6 +12,40 @@
 			width: 88%;
 		}
 
+		.icon {
+			float: left;
+			width: 25%;
+			margin-right: 5%;
+		}
+
+		.icon.n {
+			background-color: black;
+		}
+
+		.icon.t {
+			background-color: darkgray;
+		}
+
+		dl {
+			float: right;
+			width: 70%;
+		}
+
+		dt {
+			width: 40%;
+			float: left;
+			clear: both;
+		}
+
+		dd {
+			width: auto;
+			float: left;
+		}
+
+		sup {
+			font-size: x-small;
+		}
+
 	</style>
 </head>
 <body>
@@ -23,8 +57,10 @@
 	<script>
 
 		var appDiv = document.querySelector('#app');
-		var apiKey = '';
 
+		// REMOVE BEFORE COMMITTING //
+		var apiKey = '';
+		// REMOVE BEFORE COMMITTING //
 
 		var getWeather = function() {
 			fetch('https://ipapi.co/json').then(function (response) {
@@ -36,15 +72,12 @@
 
 			}).then(function (data) {
 
-				var lat = data.latitude;
-				var lon = data.longitude;
+				// change longitude to test times, change latitude to change distance from equator
+				// return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=90&lon=14');
 
-
-				return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + lat + '&lon=' + lon);
+				return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + data.latitude + '&lon=' + data.longitude);
 
 			}).then(function (weather) {
-
-				console.log(weather);
 
 				if (weather.ok) {
 					return weather.json();
@@ -53,13 +86,57 @@
 				}
 
 			}).then(function(weather) {
-				console.log(weather);
 
+				var obsTime = new Date(weather.data[0].last_ob_time);
+				var dateString = obsTime.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+				var timeString = obsTime.toLocaleString('en-GB', { hour: 'numeric', minute: 'numeric' });
+				var sunrise = weather.data[0].sunrise;
+				var sunset = weather.data[0].sunset;
+				var timeOfDay;
+				var precipitation;
+
+				// if current time is within 1hr = +/- 30mins of sunrise or sunset, is twilight: change icon background to grey
+				// else if current time is between sunrise and sunset, is day, else night and change icon background to black
+				var timeAsMinutes = function(string) {
+					return (parseInt(string.split(':')[0]) * 60) + parseInt(string.split(':')[1]);
+				};
+
+				if ( ((timeAsMinutes(timeString) < (timeAsMinutes(sunrise) + 30)) && (timeAsMinutes(timeString) > (timeAsMinutes(sunrise) - 30)))
+					|| ((timeAsMinutes(timeString) < (timeAsMinutes(sunset) + 30)) && (timeAsMinutes(timeString) > (timeAsMinutes(sunset) - 30))) ) {
+					timeOfDay = 't';
+				} else if ((timeAsMinutes(timeString) > timeAsMinutes(sunrise)) && (timeAsMinutes(timeString) < timeAsMinutes(sunset))) {
+					timeOfDay = 'd';
+				} else {
+					timeOfDay = 'n';
+				};
+
+				if (weather.data[0].snow > 0) {
+					precipitation = 'It is snowing.';
+				} else if (weather.data[0].precip > 0) {
+					precipitation = 'It is raining.';
+				} else {
+					precipitation = 'It is dry.';
+				}
+
+				appDiv.innerHTML = 
+					"<p>The weather in " +
+					weather.data[0].city_name +
+					", recorded at " +
+					timeString +
+					" on " +
+					dateString +
+					": <strong>" + weather.data[0].weather.description.toLowerCase() +
+					"</strong>. " + precipitation + "</p>" +
+					"<div class='icon " + timeOfDay + "'><img alt='Weather API day '" + weather.data[0].weather.description + " src='https://www.weatherbit.io/static/img/icons/" + weather.data[0].weather.icon + ".png'></div>" +
+					"<dl>" +
+					"<dt>Temperature:</dt><dd>" + weather.data[0].temp + "&deg;C</dd>" +
+					"<dt>Cloud cover:</dt><dd>" + weather.data[0].clouds + "%</dd>" +
+					"<dt>Wind:</dt><dd>" + weather.data[0].wind_spd.toFixed(1) + "kmh<sup>-1</sup> " + weather.data[0].wind_cdir + "</dd>" +
+					"</dl>";
 
 			}).catch(function (error) {
-				console.warn('error');
+				appDiv.innerHTML = "<p>There was a problem getting the weather.<br /><em>(error: " + error.statusText + ")</em></p>";
 			})
-
 
 		}();
 
