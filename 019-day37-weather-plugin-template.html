@@ -59,6 +59,24 @@
 	<div id="app">Checking the weather near you...</div>
 
 	<script>
+
+
+	// Wrap in a named function
+
+	var weatherApp = function(options) {
+
+		// Default settings
+		var defaults = {
+			selector: '#app',
+			units: 'M',
+			fullMessage: true,
+			icon: true
+		};
+
+		// Merge any user options into the defaults
+		var settings = Object.assign(defaults, options);
+
+
 		//
 		// Variables
 		//
@@ -217,6 +235,13 @@
 		}).catch(function (error) {
 			renderNoWeather(error);
 		});
+
+
+	};
+
+	// call weatherApp
+	weatherApp();
+
 	</script>
 </body>
 </html>
