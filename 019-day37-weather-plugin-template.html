@@ -74,7 +74,7 @@
 			apiKey: null,
 			selector: '#app',
 			units: 'M',
-			fullDescription: true,
+			fullDescription: "<dl><dt>Temperature:</dt><dd> {{ temp }} </dd><dt>Cloud cover:</dt><dd> {{ clouds }} </dd><dt>Wind:</dt><dd> {{ wind }} </dd></dl>",
 			noWeather: 'There was a problem getting the weather.',
 			icon: true
 		};
@@ -200,11 +200,10 @@
 				var speedUnit = 'ms<sup>-1</sup>';
 			}
 
-			// Otherwise, return the full description
-			var html =
-				"<dl><dt>Temperature:</dt><dd>" + sanitizeHTML(weather.temp) + tempUnit + "</dd><dt>Cloud cover:</dt><dd>" + sanitizeHTML(weather.clouds) +  "%</dd><dt>Wind:</dt><dd>" + + sanitizeHTML(weather.wind_spd.toFixed(1)) + speedUnit + "</dd></dl>";
-
-			return html;
+			return settings.fullDescription
+				.replace('{{ temp }}', sanitizeHTML(weather.temp) + tempUnit)
+				.replace('{{ clouds }}', sanitizeHTML(weather.clouds) + '%')
+				.replace('{{ wind }}', sanitizeHTML(weather.wind_spd.toFixed(1)) + speedUnit);
 		};	
 
 		/**
