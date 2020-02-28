@@ -1,22 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
 	<title>Weather App - Plugin</title>
 
 	<style type="text/css">
 		body {
 			margin: 1em auto;
 			max-width: 30em;
-			text-align: center;
 			width: 88%;
 		}
 
-		p {
-			font-size: 2em;
-			margin: 0 0 0.5em;
-			padding: 0;
+		.icon {
+			float: left;
+			width: 25%;
+			margin-right: 4%;
 		}
+
+		.icon.d {
+			border: 1px solid black;
+		}
+
+		.icon.n {
+			background-color: black;
+		}
+
+		.icon.t {
+			background-color: darkgray;
+		}
+
+		dl {
+			float: right;
+			width: 70%;
+		}
+
+		dt {
+			width: 40%;
+			float: left;
+			clear: both;
+		}
+
+		dd {
+			width: auto;
+			float: left;
+		}
+
+		sup {
+			font-size: x-small;
+		}
+
 	</style>
+
 </head>
 <body>
 
@@ -30,13 +64,13 @@
 		//
 
 		// Store the weather API key to a variable for easier configuration
-		
-		// DO NOT COMMIT THIS //
-		var apiKey = 'e94114457cfb4708b7b1e0e191bdbe91';
+
+		// REMOVE BEFORE COMMITTING //
+		var apiKey = '';
+		// REMOVE BEFORE COMMITTING //
 
 		// Get the #app element
 		var app = document.querySelector('#app');
-
 
 		//
 		// Methods
@@ -54,12 +88,69 @@
 		};
 
 		/**
-		 * Convert fahrenheit to celcius
+		 * Convert celcius to fahrenheit
 		 * @param  {String} temp The temperature in celcius
 		 * @return {Number}      The temperature in fahrenheit
 		 */
-		var fToC = function (temp) {
+		var cToF = function (temp) {
 			return (parseFloat(temp) * 9/5) + 32;
+		};
+
+		/**
+		 * Get formatted date
+		 * @param  {String} obTime The observation time
+		 * @return {String}        The observation date, formatted
+		 */
+		var dateString = function (obTime) {
+			var obsTime = new Date(obTime);
+			return obsTime.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+		};
+
+		/**
+		 * Get formatted time
+		 * @param  {String} obTime The observation time
+		 * @return {String}        The observation time, formatted
+		 */
+		var timeString = function (obTime) {
+			var obsTime = new Date(obTime);
+			return obsTime.toLocaleString('en-GB', { hour: 'numeric', minute: 'numeric' });
+		};
+
+
+		/**
+		 * Get time of day (day, twilight, night)
+		 * @param  {Object} weather Weather object
+		 * @return {String}         Letter denoting time of day
+		 */
+		var timeOfDay = function(weather) {
+
+			var timeAsMinutes = function(string) {
+				return (parseInt(string.split(':')[0]) * 60) + parseInt(string.split(':')[1]);
+			};
+
+			if ( ((timeAsMinutes(timeString(weather.ob_time)) < (timeAsMinutes(weather.sunrise) + 30)) && (timeAsMinutes(timeString(weather.ob_time)) > (timeAsMinutes(weather.sunrise) - 30)))
+				|| ((timeAsMinutes(timeString(weather.ob_time)) < (timeAsMinutes(weather.sunset) + 30)) && (timeAsMinutes(timeString(weather.ob_time)) > (timeAsMinutes(weather.sunset) - 30))) ) {
+				return 't';
+			} else if ((timeAsMinutes(timeString(weather.ob_time)) > timeAsMinutes(weather.sunrise)) && (timeAsMinutes(timeString(weather.ob_time)) < timeAsMinutes(weather.sunset))) {
+				return 'd';
+			} else {
+				return 'n';
+			};
+		};
+
+		/**
+		 * Get description of precipitation
+		 * @param  {Object} weather Weather object
+		 * @return {String}      	Precipitation string
+		 */
+		var precip = function (weather) {
+			if (weather.snow > 0) {
+				return 'It is snowing.';
+			} else if (weather.precip > 0) {
+				return 'It is raining.';
+			} else {
+				return 'It is dry.';
+			}
 		};
 
 		/**
@@ -67,18 +158,34 @@
 		 * @param  {Object} weather The weather data object
 		 */
 		var renderWeather = function (weather) {
+
+
 			app.innerHTML =
-				'<p>' +
-					'<img src="https://www.weatherbit.io/static/img/icons/' + weather.weather.icon + '.png">' +
-				'</p>' +
-				'<p>It is currently ' + fToC(sanitizeHTML(weather.temp)) + ' degrees and ' + sanitizeHTML(weather.weather.description).toLowerCase() + ' in ' + sanitizeHTML(weather.city_name) + ', ' + sanitizeHTML(weather.state_code) + '.</p>';
+
+				"<p>The weather in " +
+				sanitizeHTML(weather.city_name) +
+				", recorded at " +
+				timeString(sanitizeHTML(weather.ob_time)) +
+				" on " +
+				dateString(sanitizeHTML(weather.ob_time)) +
+				": <strong>" + sanitizeHTML(weather.weather.description.toLowerCase()) +
+				"</strong>. " + precip(weather) + "</p>" +
+
+				"<div class='icon " + timeOfDay(weather) + "'><img alt='Weather API day '" + sanitizeHTML(weather.weather.description) + " src='https://www.weatherbit.io/static/img/icons/" + sanitizeHTML(weather.weather.icon) + ".png'></div>" +
+
+				"<dl>" +
+				"<dt>Temperature:</dt><dd>" + sanitizeHTML(weather.temp) + "&deg;C</dd>" +
+				"<dt>Cloud cover:</dt><dd>" + sanitizeHTML(weather.clouds) + "%</dd>" +
+				"<dt>Wind:</dt><dd>" + sanitizeHTML(weather.wind_spd.toFixed(1)) + "ms<sup>-1</sup> " + sanitizeHTML(weather.wind_cdir) + "</dd>" +
+				"</dl>";
+
 		};
 
 		/**
 		 * Display a message when no weather data can be found
 		 */
-		var renderNoWeather = function () {
-			app.innerHTML = 'Unable to get weather data at this time. Sorry!';
+		var renderNoWeather = function (error) {
+			app.innerHTML = "<p>There was a problem getting the weather.<br /><em>(error: " + error.statusText + ")</em></p>";
 		};
 
 
@@ -97,7 +204,7 @@
 		}).then(function (data) {
 			// Pass data into another API request
 			// Then, return the new Promise into the stream
-			return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + data.latitude + '&lon=' + data.longitude);
+			return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + data.latitude + '&lon=' + data.longitude);			
 		}).then(function (response) {
 			if (response.ok) {
 				return response.json();
@@ -107,8 +214,8 @@
 		}).then(function (data) {
 			// Pass the first weather item into a helper function to render the UI
 			renderWeather(data.data[0]);
-		}).catch(function () {
-			renderNoWeather();
+		}).catch(function (error) {
+			renderNoWeather(error);
 		});
 	</script>
 </body>
