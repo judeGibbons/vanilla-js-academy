@@ -71,30 +71,26 @@
 
 		// Default settings
 		var defaults = {
+			apiKey: null,
 			selector: '#app',
 			units: 'M',
-<<<<<<< HEAD
-			fullMessage: true,
-=======
 			fullDescription: true,
 			noWeather: 'There was a problem getting the weather.',
->>>>>>> 10e5dc0... Change name of parameter
 			icon: true
 		};
 
 		// Merge any user options into the defaults
 		var settings = Object.assign(defaults, options);
 
+		// Check for API key and don't run if not provided
+		if (!settings.apiKey) {
+			console.warn('Please provide an API key.');
+			return;
+		}
 
 		//
 		// Variables
 		//
-
-		// Store the weather API key to a variable for easier configuration
-
-		// REMOVE BEFORE COMMITTING //
-		var apiKey = '';
-		// REMOVE BEFORE COMMITTING //
 
 		// Get the #app element
 		var app = document.querySelector(settings.selector);
@@ -219,7 +215,7 @@
 		 * Display a message when no weather data can be found
 		 */
 		var renderNoWeather = function (error) {
-			app.innerHTML = "<p>There was a problem getting the weather.<br /><em>(error: " + error.statusText + ")</em></p>";
+			app.innerHTML = "<p>" + settings.noWeather +  "<br /><em>(error: " + error.statusText + ")</em></p>";
 		};
 
 
@@ -238,7 +234,7 @@
 		}).then(function (data) {
 			// Pass data into another API request
 			// Then, return the new Promise into the stream
-			return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + data.latitude + '&lon=' + data.longitude + '&units=' + settings.units);			
+			return fetch('https://api.weatherbit.io/v2.0/current?key=' + settings.apiKey + '&lat=' + data.latitude + '&lon=' + data.longitude + '&units=' + settings.units);			
 		}).then(function (response) {
 			if (response.ok) {
 				return response.json();
