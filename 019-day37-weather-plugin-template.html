@@ -168,10 +168,29 @@
 		};
 
 		/**
-		 * Render the weather data into the DOM
-		 * @param  {Object} weather The weather data object
+		 * Get string to display icon
+		 * @param  {Object} weather Weather object
+		 * @return {String}      	A markup string for the icon
 		 */
-		var renderWeather = function (weather) {
+		var getIcon = function (weather) {
+			// If the icon is deactivated, return an empty string
+			if (!settings.icon) return '';
+
+			// Otherwise, return the icon
+			var html =
+				"<div class='icon " + timeOfDay(weather) + "'><img alt='Weather API day '" + sanitizeHTML(weather.weather.description) + " src='https://www.weatherbit.io/static/img/icons/" + sanitizeHTML(weather.weather.icon) + ".png'></div>";
+
+			return html;
+		};	
+
+		/**
+		 * Get string to display weather description
+		 * @param  {Object} weather Weather object
+		 * @return {String}      	A markup string for the full description
+		 */
+		var getDescription = function (weather) {
+			// If the full description is deactivated, return an empty string
+			if (!settings.fullDescription) return '';
 
 			if (settings.units == 'I') {
 				var tempUnit = '&deg;F';
@@ -181,18 +200,18 @@
 				var speedUnit = 'ms<sup>-1</sup>';
 			}
 
-			if (settings.icon == true) {
-				var iconString = "<div class='icon " + timeOfDay(weather) + "'><img alt='Weather API day '" + sanitizeHTML(weather.weather.description) + " src='https://www.weatherbit.io/static/img/icons/" + sanitizeHTML(weather.weather.icon) + ".png'></div>";
-			} else {
-				var iconString = "";
-			}
+			// Otherwise, return the full description
+			var html =
+				"<dl><dt>Temperature:</dt><dd>" + sanitizeHTML(weather.temp) + tempUnit + "</dd><dt>Cloud cover:</dt><dd>" + sanitizeHTML(weather.clouds) +  "%</dd><dt>Wind:</dt><dd>" + + sanitizeHTML(weather.wind_spd.toFixed(1)) + speedUnit + "</dd></dl>";
 
-			if (settings.fullDescription == true) {
-				var fullDescriptionString = "<dl><dt>Temperature:</dt><dd>" + sanitizeHTML(weather.temp) + tempUnit + "</dd><dt>Cloud cover:</dt><dd>" + sanitizeHTML(weather.clouds) + "%</dd><dt>Wind:</dt><dd>" + sanitizeHTML(weather.wind_spd.toFixed(1)) + speedUnit + ' ' + sanitizeHTML(weather.wind_cdir) + "</dd></dl>";
-			} else {
-				var fullDescriptionString = "";
-			}
+			return html;
+		};	
 
+		/**
+		 * Render the weather data into the DOM
+		 * @param  {Object} weather The weather data object
+		 */
+		var renderWeather = function (weather) {
 
 			app.innerHTML =
 
@@ -205,9 +224,8 @@
 				": <strong>" + sanitizeHTML(weather.weather.description.toLowerCase()) +
 				"</strong>. " + precip(weather) + "</p>" +
 
-				iconString +
-
-				fullDescriptionString;
+				getIcon(weather) +
+				getDescription(weather);
 
 		};
 
