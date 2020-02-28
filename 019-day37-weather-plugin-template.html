@@ -31,6 +31,10 @@
 
 		dl {
 			float: right;
+			width: 100%;
+		}
+
+		.icon + dl {
 			width: 70%;
 		}
 
@@ -69,7 +73,12 @@
 		var defaults = {
 			selector: '#app',
 			units: 'M',
+<<<<<<< HEAD
 			fullMessage: true,
+=======
+			fullDescription: true,
+			noWeather: 'There was a problem getting the weather.',
+>>>>>>> 10e5dc0... Change name of parameter
 			icon: true
 		};
 
@@ -88,7 +97,7 @@
 		// REMOVE BEFORE COMMITTING //
 
 		// Get the #app element
-		var app = document.querySelector('#app');
+		var app = document.querySelector(settings.selector);
 
 		//
 		// Methods
@@ -103,15 +112,6 @@
 			var temp = document.createElement('div');
 			temp.textContent = str;
 			return temp.innerHTML;
-		};
-
-		/**
-		 * Convert celcius to fahrenheit
-		 * @param  {String} temp The temperature in celcius
-		 * @return {Number}      The temperature in fahrenheit
-		 */
-		var cToF = function (temp) {
-			return (parseFloat(temp) * 9/5) + 32;
 		};
 
 		/**
@@ -177,6 +177,26 @@
 		 */
 		var renderWeather = function (weather) {
 
+			if (settings.units == 'I') {
+				var tempUnit = '&deg;F';
+				var speedUnit = 'mph';
+			} else {
+				var tempUnit = '&deg;C';
+				var speedUnit = 'ms<sup>-1</sup>';
+			}
+
+			if (settings.icon == true) {
+				var iconString = "<div class='icon " + timeOfDay(weather) + "'><img alt='Weather API day '" + sanitizeHTML(weather.weather.description) + " src='https://www.weatherbit.io/static/img/icons/" + sanitizeHTML(weather.weather.icon) + ".png'></div>";
+			} else {
+				var iconString = "";
+			}
+
+			if (settings.fullDescription == true) {
+				var fullDescriptionString = "<dl><dt>Temperature:</dt><dd>" + sanitizeHTML(weather.temp) + tempUnit + "</dd><dt>Cloud cover:</dt><dd>" + sanitizeHTML(weather.clouds) + "%</dd><dt>Wind:</dt><dd>" + sanitizeHTML(weather.wind_spd.toFixed(1)) + speedUnit + ' ' + sanitizeHTML(weather.wind_cdir) + "</dd></dl>";
+			} else {
+				var fullDescriptionString = "";
+			}
+
 
 			app.innerHTML =
 
@@ -189,13 +209,9 @@
 				": <strong>" + sanitizeHTML(weather.weather.description.toLowerCase()) +
 				"</strong>. " + precip(weather) + "</p>" +
 
-				"<div class='icon " + timeOfDay(weather) + "'><img alt='Weather API day '" + sanitizeHTML(weather.weather.description) + " src='https://www.weatherbit.io/static/img/icons/" + sanitizeHTML(weather.weather.icon) + ".png'></div>" +
+				iconString +
 
-				"<dl>" +
-				"<dt>Temperature:</dt><dd>" + sanitizeHTML(weather.temp) + "&deg;C</dd>" +
-				"<dt>Cloud cover:</dt><dd>" + sanitizeHTML(weather.clouds) + "%</dd>" +
-				"<dt>Wind:</dt><dd>" + sanitizeHTML(weather.wind_spd.toFixed(1)) + "ms<sup>-1</sup> " + sanitizeHTML(weather.wind_cdir) + "</dd>" +
-				"</dl>";
+				fullDescriptionString;
 
 		};
 
@@ -222,7 +238,7 @@
 		}).then(function (data) {
 			// Pass data into another API request
 			// Then, return the new Promise into the stream
-			return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + data.latitude + '&lon=' + data.longitude);			
+			return fetch('https://api.weatherbit.io/v2.0/current?key=' + apiKey + '&lat=' + data.latitude + '&lon=' + data.longitude + '&units=' + settings.units);			
 		}).then(function (response) {
 			if (response.ok) {
 				return response.json();
