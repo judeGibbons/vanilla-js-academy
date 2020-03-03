@@ -36,7 +36,7 @@
 
 	<script>
 
-		var buttonColours = (function () {
+		var _ = (function () {
 
 			var buttons = document.querySelectorAll('button');
 
@@ -55,7 +55,7 @@
 
 
 			/**
-			 * Copy an array - private, only within library
+			 * Copy an array
 			 * @param  {Array} arr The original
 			 * @return {Array}     A copy
 			 */
@@ -65,11 +65,11 @@
 
 
 			/**
-			 * Get an immutable copy of the buttons - can call externally by prefacing methods.
+			 * Get an immutable copy of the buttons
 			 * @param  {Array} The buttons
 			 */
 			methods.getButtons = function () {
-				return methods.copy(convertToArray(buttons));
+				return copy(methods.convertToArray(buttons));
 			};
 
 
@@ -89,7 +89,7 @@
 			 * @return {NodeList}     	 DOM elements
 			 */
 			methods.getAllElements = function(selector) {
-				return document.querySelectorAll(selector); 
+				return methods.convertToArray(document.querySelectorAll(selector));
 			};
 
 
@@ -100,7 +100,7 @@
 			 */
 			methods.addClass = function(array, classname) {
 				array.forEach(function (element) {
-					element.setAttribute('class', classname);
+					element.classList.add(classname);
 				});
 			};
 
@@ -112,9 +112,7 @@
 			 */
 			methods.removeClass = function(array, classname) {
 				array.forEach(function (element) {
-					if (element.matches('.' + classname)) {
-						element.removeAttribute('class', classname);
-					};
+					element.classList.remove(classname);
 				});
 			};
 
@@ -123,17 +121,30 @@
 
 		})();
 
+	console.log("return array of button elements")
+	console.log(_.getButtons('button'));
+	console.log("return first button element")
+	console.log(_.getFirstElement('button'));
+	console.log("return all buttons as allButtons variable");
+	var allButtons = _.getAllElements('button');
+	console.log(allButtons);
+
+	var buttonColours = new Promise(function (resolve, reject) {
+		setTimeout(function () {
+			console.log("remove blue class from buttons");
+			resolve(_.removeClass(allButtons, 'btn-blue'));
+		}, 1500);
+	});
+
+	buttonColours.then(function () {
+		setTimeout(function () {
+			console.log("add purple class to buttons");
+			_.addClass(allButtons, 'btn-purple');
+		}, 1500);
+	});
 
 	</script>
 
-	<!-- buttonColours.getButtons() returns array of buttons -->
-	<!-- buttonColours.getFirstElement('button') returns first button element -->
-	<!-- buttonColours.getAllElements('button') returns NodeList of buttons -->
-	<!-- buttonColours.convertToArray(buttonColours.getAllElements('button'))
-			returns array of all buttons -->
-	<!-- assign this to var allButtons -->
-	<!-- buttonColours.removeClass(allButtons, 'btn-blue') removes blue class -->
-	<!-- buttonColours.addClass(allButtons, 'btn-purple') adds purple class -->
 
 </body>
 </html>
