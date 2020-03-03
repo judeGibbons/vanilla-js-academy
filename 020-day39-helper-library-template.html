@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
 	<title>Helper Library</title>
 
 	<style type="text/css">
@@ -34,7 +35,105 @@
 	</p>
 
 	<script>
-		// Your code goes here...
+
+		var buttonColours = (function () {
+
+			var buttons = document.querySelectorAll('button');
+
+			// Holds our public methods
+			var methods = {};
+
+			
+			/**
+			 * Convert nodeList to array
+			 * @param  {NodeList} nodelist  List of nodes
+			 * @return {Array}     			An array
+			 */
+			methods.convertToArray = function(nodelist) {
+				return Array.prototype.slice.call(nodelist);
+			};
+
+
+			/**
+			 * Copy an array - private, only within library
+			 * @param  {Array} arr The original
+			 * @return {Array}     A copy
+			 */
+			var copy = function (arr) {
+				return arr.slice();
+			};
+
+
+			/**
+			 * Get an immutable copy of the buttons - can call externally by prefacing methods.
+			 * @param  {Array} The buttons
+			 */
+			methods.getButtons = function () {
+				return methods.copy(convertToArray(buttons));
+			};
+
+
+			/**
+			 * Get first element on page
+			 * @param  {String} selector Selector to match
+			 * @return {Object}     	 DOM element
+			 */
+			methods.getFirstElement = function(selector) {
+				return document.querySelector(selector);
+			};
+
+
+			/**
+			 * Get first element on page
+			 * @param  {String} selector Selector to match
+			 * @return {NodeList}     	 DOM elements
+			 */
+			methods.getAllElements = function(selector) {
+				return document.querySelectorAll(selector); 
+			};
+
+
+			/**
+			 * Add class to selected elements
+			 * @param  {Array} array      Array of elements
+			 * @param  {String} classname Class name to add
+			 */
+			methods.addClass = function(array, classname) {
+				array.forEach(function (element) {
+					element.setAttribute('class', classname);
+				});
+			};
+
+
+			/**
+			 * Remove class from selected elements
+			 * @param  {Array} array      Array of elements
+			 * @param  {String} classname Class name to remove
+			 */
+			methods.removeClass = function(array, classname) {
+				array.forEach(function (element) {
+					if (element.matches('.' + classname)) {
+						element.removeAttribute('class', classname);
+					};
+				});
+			};
+
+			// Return public methods
+			return methods;
+
+		})();
+
+
 	</script>
+
+	<!-- buttonColours.getButtons() returns array of buttons -->
+	<!-- buttonColours.getFirstElement('button') returns first button element -->
+	<!-- buttonColours.getAllElements('button') returns NodeList of buttons -->
+	<!-- buttonColours.convertToArray(buttonColours.getAllElements('button'))
+			returns array of all buttons -->
+	<!-- assign this to var allButtons -->
+	<!-- buttonColours.removeClass(allButtons, 'btn-blue') removes blue class -->
+	<!-- buttonColours.addClass(allButtons, 'btn-purple') adds purple class -->
+
 </body>
 </html>
